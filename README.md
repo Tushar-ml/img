@@ -2,10 +2,70 @@
 
 
 
-pip install tez
-pip install efficientnet_pytorch
-pip uninstall albumentations
+pip install tez efficientnet_pytorch albumentations
+
 pip install albumentations
+pip install open
+
+pip install torch==1.7.1+cu101 torchvision==0.8.2+cu101 torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
+
+pip install nfnets-pytorch
+
+
+
+
+#####################################################################
+Package                Version                                                                                                                                                                
+---------------------- -------------------                                                                                                                                                                 
+accelerate             0.3.0                                                                                                                                                                              
+albumentations         1.0.0                                                                                                                                                                               
+certifi                2021.5.30                                                                                                                                                                           
+cycler                 0.10.0                                                                                                                                                                              
+dataclasses            0.8                                                                                                                                                                                 
+decorator              4.4.2                                                                                                                                                                               
+deepspeed              0.3.16                                                                                                                                                                              
+efficientnet-pytorch   0.7.1                                                                                                                                                                               
+fire                   0.4.0                                                                                                                                                                               
+imageio                2.9.0                                                                                                                                                                               
+joblib                 1.0.1                                                                                                                                                                               
+kiwisolver             1.3.1                                                                                                                                                                               
+matplotlib             3.3.4                                                                                                                                                                               
+networkx               2.5.1                                                                                                                                                                               
+nfnets-pytorch         0.1.3                                                                                                                                                                               
+ninja                  1.10.0.post2                                                                                                                                                                        
+numpy                  1.19.5                                                                                                                                                                              
+opencv-python-headless 4.5.2.54                                                                                                                                                                            
+pandas                 1.1.5                                                                                                                                                                               
+Pillow                 8.2.0                                                                                                                                                                               
+pip                    21.1.2                                                                                                                                                                              
+protobuf               3.17.3                                                                                                                                                                              
+psutil                 5.8.0                                                                                                                                                                               
+pyaml                  20.4.0                                                                                                                                                                              
+pyparsing              2.4.7                                                                                                                                                                               
+python-dateutil        2.8.1                                                                                                                                                                               
+pytz                   2021.1                                                                                                                                                                              
+PyWavelets             1.1.1                                                                                                                                                                               
+PyYAML                 5.4.1                                                                                                                                                                               
+scikit-image           0.17.2                                                                                                                                                                              
+scikit-learn           0.24.2                                                                                                                                                                              
+scipy                  1.5.4                                                                                                                                                                               
+setuptools             49.6.0.post20210108                                                                                                                                                                 
+six                    1.16.0                                                                                                                                                                              
+tensorboardX           1.8                                                                                                                                                                                 
+termcolor              1.1.0                                                                                                                                                                               
+tez                    0.1.4                                                                                                                                                                               
+threadpoolctl          2.1.0                                                                                                                                                                               
+tifffile               2020.9.3                                                                                                                                                                            
+torch                  1.7.1+cu101                                                                                                                                                                         
+torchvision            0.8.2+cu101                                                                                                                                                                         
+tqdm                   4.61.1                                                                                                                                                                              
+typing-extensions      3.10.0.0                                                                                                                                                                            
+wheel                  0.36.2                                                                                                                                                                             
+wincertstore           0.2 
+
+
+
+https://nlp123456.s3.ap-northeast-1.amazonaws.com/ztmp.tar.gz.001
 
 
 

@@ -1,47 +1,28 @@
-import os
-import albumentations
-import  matplotlib.pyplot as plt
-import pandas as pd
-
-import tez
-
-from tez.datasets import ImageDataset
-from tez.callbacks import EarlyStopping
-
-import torch
-import torch.nn as nn
-
-import torchvision
-
-from sklearn import metrics, model_selection
-from efficientnet_pytorch import EfficientNet
-from pathlib import Path
 import argparse
 import os
+import warnings
+from pathlib import Path
 
 import albumentations
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import tez
 import torch
 import torch.nn as nn
-from efficientnet_pytorch import EfficientNet
-from sklearn import metrics, model_selection, preprocessing
-from tez.callbacks import EarlyStopping, Callback
-from tez.datasets import ImageDataset
+import torchvision
+from PIL import Image
+from efficientnet_pytorch import EfficientNet, EfficientNet
+from sklearn import metrics, metrics, model_selection, model_selection, preprocessing
+from sklearn.model_selection import train_test_split
+from tez.callbacks import Callback, EarlyStopping, EarlyStopping
+from tez.datasets import ImageDataset, ImageDataset
 from torch.nn import functional as F
-from torch.utils.data import Dataset, DataLoader
-
+from torch.utils.data import DataLoader, Dataset
+from torchvision.transforms import CenterCrop, Compose, Normalize, Resize, ToTensor
 from tqdm import tqdm
 
-import numpy as np
-import cv2
-
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-from PIL import Image
-
-from sklearn.model_selection import train_test_split
-
-import warnings
 warnings.filterwarnings("ignore")
 
 from sklearn.linear_model import LogisticRegression
@@ -113,6 +94,7 @@ class FashionImageDataset(Dataset):
 
     def __len__(self):
         return len(self.images)
+
 
     def __getitem__(self, idx):
         filename =self.images[idx]
@@ -325,21 +307,22 @@ def add_argument():
 
 
 
-if __name__ == "__main__":
+
+def run():
 
     args = add_argument()
-    
+
     if args.config != "":
         with open(args.config) as f:
             config = json.load(f)["custom_params"]
     else:
         with open(args.deepspeed_config) as f:
             config = json.load(f)["custom_params"]
-    
+
     # m_config = cfg['model_params'][cfg["model_name"]]
     model_config = config['model_params'][args.model]
 
-    
+
     CSV_PATH = os.path.join(config['base_dir'], config['input_dir'], config['dataset_name'], config['csv_dir'])
 
     MODEL_PATH = os.path.join(config['base_dir'], config['models_dir'], config['dataset_name'], model_config['model_name'], str(model_config['version']))
@@ -356,12 +339,12 @@ if __name__ == "__main__":
         IMAGE_PATH = os.path.join(config['base_dir'], config['vector_dir'], config['dataset_name'], model_config['input_data_dir'])
         train_dataset = FashionImageDataset(IMAGE_PATH=IMAGE_PATH, DF_PATH= os.path.join(CSV_PATH, config['train_df']), config=config)
         val_dataset   = FashionImageDataset(IMAGE_PATH=IMAGE_PATH, DF_PATH= os.path.join(CSV_PATH, config['val_df']), config=config)
-        
+
 
     train_dl = DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=8)
     val_dl = DataLoader(val_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=8)
 
-    
+
     model = FashionModel(config=model_config, num_classes=class_dict)
     try:
         config["use_deepspeed"] = True if args.deepspeed_config else False
@@ -377,18 +360,18 @@ if __name__ == "__main__":
         print("Training model with pytorch")
         print("============================================")
         model.to(config['device']);
-        
+
         if model_config['model_name'] == 'nfnets':
             optimizer = SGD_AGC(
                     named_params=model.named_parameters(), # Pass named parameters
                     lr=config['lr_rate'],
                     momentum=0.9,
                     clipping=0.1, # New clipping parameter
-                    weight_decay=config['weight_decay'], 
+                    weight_decay=config['weight_decay'],
                     nesterov=True)
         else:
             optimizer = torch.optim.Adam(model.parameters(), lr=config['lr_rate'])
-        
+
         scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=1, eta_min=1e-6, last_epoch=-1)
 
         best_loss = float('inf')
@@ -396,9 +379,9 @@ if __name__ == "__main__":
             tk0 = tqdm(train_dl, total=len(train_dl))
             losses = []
             monitor = []
-            
+
             model.train()
-            
+
             for i, data in enumerate(tk0):
                 for key, value in data.items():
                     data[key] = value.to(config['device'])
@@ -408,7 +391,7 @@ if __name__ == "__main__":
 
                 # forward + backward + optimize
                 outputs, loss, metric = model(**data)
-                
+
                 losses.append(loss.item())
                 monitor.append(metric['accuracy'])
                 loss.backward()
@@ -463,33 +446,33 @@ if __name__ == "__main__":
         print("============================================")
         config["model_name"] = config["model_name"] + "_deepspeed"
 
-        
-      
+
+
         parameters = filter(lambda p: p.requires_grad, model.parameters())
-        
-        
-        model_engine, optimizer, trainloader, __ = deepspeed.initialize(args=args, 
+
+
+        model_engine, optimizer, trainloader, __ = deepspeed.initialize(args=args,
                     model=model, model_parameters=parameters, training_data=train_dataset)
         best_loss = float('inf')
         for epoch in range(config['epochs']):  # loop over the dataset multiple times
             tk0 = tqdm(train_dl, total=len(train_dl))
             losses = []
             monitor = []
-            
+
             model.train()
-            
+
             for i, data in enumerate(tk0):
                 # get the inputs; data is a list of [inputs, labels]
                 for key, value in data.items():
                     data[key] = value.to(model_engine.local_rank)
 
                 outputs, loss, metric = model_engine(**data)
-                
+
                 losses.append(loss.item())
                 monitor.append(metric['accuracy'])
                 model_engine.backward(loss)
                 model_engine.step()
-            
+
                 tk0.set_postfix(loss=round(sum(losses)/len(losses), 2), stage="train", accuracy=round(sum(monitor)/len(monitor), 3))
             tk0.close()
             tk0 = tqdm(val_dl, total=len(val_dl))
@@ -531,3 +514,9 @@ if __name__ == "__main__":
         torch.save(model_dict, os.path.join(MODEL_PATH, f"checkpoint_last.pt"))
         print('Finished Training')
 
+
+
+
+if __name__ == "__main__":
+   import fire
+   fire.Fire()

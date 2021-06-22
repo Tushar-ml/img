@@ -120,6 +120,44 @@ def decode_label(df, dfx, column):
     return list(le.inverse_transform(dfx[column].tolist()))
 
 
+
+def config_get_paths(cfg, m_config, name):
+
+    if 'preprocess' in name :
+        config_preprocess = cfg['preprocess']
+        IMAGE_PATH = os.path.join(cfg['base_dir'], cfg['input_dir'], cfg['dataset_name'], cfg['train_dir'])
+        CSV_PATH = os.path.join(cfg['base_dir'], cfg['input_dir'], cfg['dataset_name'], cfg['csv_dir'])
+
+        return IMAGE_PATH, CSV_PATH
+
+
+    if 'train' in name or 'predict' in name:
+        CSV_PATH = os.path.join(cfg['base_dir'], cfg['input_dir'], cfg['dataset_name'], cfg['csv_dir'])
+        MODEL_PATH = os.path.join(cfg['base_dir'], cfg['models_dir'], cfg['dataset_name'], \
+                                  m_config['model_name'], str(m_config['version']))
+
+        if cfg['feature_extractor']['input_data_type'] == 'train':
+            if m_config['model_name'] == 'smallmodel':
+                INPUT_PATH = os.path.join(cfg['base_dir'], cfg['vector_dir'], cfg['dataset_name'], m_config['input_data_dir'])
+            else:
+                INPUT_PATH = os.path.join(cfg['base_dir'], cfg['input_dir'], cfg['dataset_name'], cfg['train_dir'])
+            OUTPUT_PATH = os.path.join(cfg['base_dir'], cfg['vector_dir'], cfg['dataset_name'], m_config['model_name'])
+
+        else:
+            if m_config['model_name'] == 'smallmodel':
+                INPUT_PATH = os.path.join(cfg['base_dir'], cfg['vector_dir'], cfg['dataset_name'], "test_" + m_config['input_data_dir'])
+            else:
+                INPUT_PATH = os.path.join(cfg['base_dir'], cfg['input_dir'], cfg['dataset_name'], cfg['test_dir'])
+            OUTPUT_PATH = os.path.join(cfg['base_dir'], cfg['vector_dir'], cfg['dataset_name'], "test_" + m_config['model_name'])
+
+
+        log(INPUT_PATH)
+        os.makedirs(MODEL_PATH, exist_ok=True)
+        os.makedirs(OUTPUT_PATH, exist_ok=True)
+        return   CSV_PATH, MODEL_PATH, INPUT_PATH, OUTPUT_PATH
+
+
+
 def generate_dataset(config):
     
     config_preprocess = config['preprocess']
@@ -174,29 +212,38 @@ def generate_dataset(config):
     log("Stage: df_preprocess Finished ------------------------------------------------")
 
 
+
+
 def feature_extractor(cfg, m_config):
 
     CSV_PATH = os.path.join(cfg['base_dir'], cfg['input_dir'], cfg['dataset_name'], cfg['csv_dir'])
     MODEL_PATH = os.path.join(cfg['base_dir'], cfg['models_dir'], cfg['dataset_name'], \
                               m_config['model_name'], str(m_config['version']))
+
     if cfg['feature_extractor']['input_data_type'] == 'train':
         if m_config['model_name'] == 'smallmodel':
             INPUT_PATH = os.path.join(cfg['base_dir'], cfg['vector_dir'], cfg['dataset_name'], m_config['input_data_dir'])
+
         else:
             INPUT_PATH = os.path.join(cfg['base_dir'], cfg['input_dir'], cfg['dataset_name'], cfg['train_dir'])
+
+        MODEL_PATH = os.path.join(MODEL_PATH, 'checkpoint_best.pt')
         OUTPUT_PATH = os.path.join(cfg['base_dir'], cfg['vector_dir'], cfg['dataset_name'], m_config['model_name'])
+
     else:
         if m_config['model_name'] == 'smallmodel':
             INPUT_PATH = os.path.join(cfg['base_dir'], cfg['vector_dir'], cfg['dataset_name'], "test_" + m_config['input_data_dir'])
         else:
             INPUT_PATH = os.path.join(cfg['base_dir'], cfg['input_dir'], cfg['dataset_name'], cfg['test_dir'])
+
+        MODEL_PATH = os.path.join(MODEL_PATH, 'checkpoint_best.pt')
         OUTPUT_PATH = os.path.join(cfg['base_dir'], cfg['vector_dir'], cfg['dataset_name'], "test_" + m_config['model_name'])
 
     log(INPUT_PATH)
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
-    log("########### Feature Extraction Started ###########")
 
+    log("########### Feature Extraction Started ############################################")
     if m_config['model_name'] == 'bigmodel':
 
         MODEL_PATH = m_config["model_path"]
