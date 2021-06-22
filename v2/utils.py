@@ -121,7 +121,7 @@ def decode_label(df, dfx, column):
 
 
 
-def config_get_paths(cfg, m_config, name):
+def config_get_paths(cfg, m_config=None, name='preprocess/train/predict'):
 
     if 'preprocess' in name :
         config_preprocess = cfg['preprocess']
@@ -160,7 +160,7 @@ def config_get_paths(cfg, m_config, name):
 
 def generate_dataset(config):
     
-    config_preprocess = config['preprocess']
+    cfg2 = config['preprocess']
 
     IMAGE_PATH = os.path.join(config['base_dir'], config['input_dir'], config['dataset_name'], config['train_dir'])
 
@@ -168,7 +168,7 @@ def generate_dataset(config):
 
     os.makedirs(CSV_PATH, exist_ok=True)
     
-    dfx = pd.read_csv(os.path.join(CSV_PATH, config_preprocess['base_df']), error_bad_lines=False)
+    dfx = pd.read_csv(os.path.join(CSV_PATH, cfg2['base_df']), error_bad_lines=False)
     log("Dataset Size: ", dfx.shape)
     dfx = dfx.dropna()
     dfx = dfx[['id', 'gender', 'masterCategory', 'subCategory', 'articleType', 'baseColour', 'season', 'usage']]
@@ -176,7 +176,7 @@ def generate_dataset(config):
     file_not_found = []
     for i in dfx.id.tolist():
         flag = False
-        for ext in config_preprocess['image_exts']:
+        for ext in cfg2['image_exts']:
             if os.path.isfile(os.path.join(IMAGE_PATH, str(i) + f".{ext}")):
                 flag = True
                 break
@@ -186,7 +186,7 @@ def generate_dataset(config):
 
     
     dfx = dfx[~dfx['id'].isin(file_not_found)]
-    dfx.to_csv(os.path.join(CSV_PATH, config_preprocess['base_df'].split('.')[0] + '_df.csv'), index=False)
+    dfx.to_csv(os.path.join(CSV_PATH, cfg2['base_df'].split('.')[0] + '_df.csv'), index=False)
     articleTypes = []
     for k, v in dict(dfx.articleType.value_counts()).items():
         if v <= 10:
@@ -194,7 +194,7 @@ def generate_dataset(config):
     dfx = dfx[~dfx['articleType'].isin(articleTypes)]
 
     # dfx.to_csv(config_preprocess['preprocessed_df_with_classes'], index=False)
-    dfx.to_csv(os.path.join(CSV_PATH, config_preprocess['preprocessed_df_with_classes']), index=False)
+    dfx.to_csv(os.path.join(CSV_PATH, cfg2['preprocessed_df_with_classes']), index=False)
 
     for col in dfx.columns.tolist()[1:]:
         dfx[col] = encode_label(dfx, dfx, col)
@@ -202,13 +202,13 @@ def generate_dataset(config):
     log("Final Dataset Size: ", dfx.shape)
             
     # dfx.to_csv(config_preprocess['preprocessed_df'], index=False)
-    dfx.to_csv(os.path.join(CSV_PATH, config_preprocess['preprocessed_df']), index=False)
-    train_dfx, val_dfx = train_test_split(dfx, test_size=config_preprocess["val_set_size"], random_state=42)
+    dfx.to_csv(os.path.join(CSV_PATH, cfg2['preprocessed_df']), index=False)
+    train_dfx, val_dfx = train_test_split(dfx, test_size=cfg2["val_set_size"], random_state=42)
 
     # train_dfx.to_csv(config_preprocess['train_df'], index=False)
     # val_dfx.to_csv(config_preprocess['val_df'], index=False)
-    train_dfx.to_csv(os.path.join(CSV_PATH, config_preprocess['train_df']), index=False)
-    val_dfx.to_csv(os.path.join(CSV_PATH, config_preprocess['val_df']), index=False)
+    train_dfx.to_csv(os.path.join(CSV_PATH, cfg2['train_df']), index=False)
+    val_dfx.to_csv(os.path.join(CSV_PATH, cfg2['val_df']), index=False)
     log("Stage: df_preprocess Finished ------------------------------------------------")
 
 
