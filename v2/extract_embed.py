@@ -63,56 +63,9 @@ def log(*s):
 # =====================================================================
 # Dataset for Big Model1                                                =
 # =====================================================================
-
-class FashionImageDataset(Dataset):
-    def __init__(self, IMAGE_PATH, config, m_config, aug=None):
-        """
-        Args:
-            IMAGE_PATH (string): Directory with all the images or vectors
-            DF_PATH (string): Path to csv file
-            aug: augumentation
-
-        """
-        self.image_dir = IMAGE_PATH
-        self.config = config
-        self.m_config = m_config
-
-        if self.config['sample']:
-            if self.m_config['model_name'] == "smallmodel":
-                self.images = list(Path(IMAGE_PATH).glob("*.npy"))[:200]
-            else:
-                self.images = list(Path(IMAGE_PATH).glob("*.jpg"))[:200]
-        else:
-            if self.m_config['model_name'] == "smallmodel":
-                self.images = list(Path(IMAGE_PATH).glob("*.npy"))
-            else:
-                self.images = list(Path(IMAGE_PATH).glob("*.jpg"))
-
-        if aug is None:
-              self.aug = Compose([
-                    Resize((224, 224), interpolation=Image.BICUBIC),
-                    # CenterCrop((224, 224)),
-                    ToTensor(),
-                    Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ])
-        else:
-            self.aug = aug
+from datasets import FashionImageDataset
 
 
-    def __len__(self):
-        return len(self.images)
-
-    def __getitem__(self, idx):
-
-        filename =self.images[idx]
-        if self.m_config['model_name'] == "smallmodel":
-            img = np.load(filename).astype(np.float32)
-            img = torch.from_numpy(img)
-        else:
-            img = Image.open(filename).convert('RGB')
-            img = self.aug(img).type(torch.FloatTensor)
-
-        return {'image': img, 'filename': str(filename.stem)}
 
 
 def encode_label(df, dfx, column):
