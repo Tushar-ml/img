@@ -54,7 +54,7 @@ from models import FashionModel
 #                                       NFNets Model                                                  #
 #######################################################################################################
 
-
+"""
 class FashionModel(nn.Module):
     def __init__(self, config, num_classes):
         super().__init__()
@@ -172,7 +172,7 @@ class FashionModel(nn.Module):
         x = self.relu(self.linear2(self.dropout(x)))
 
         return x
-
+"""
     
 def add_argument():
 
@@ -224,10 +224,24 @@ def add_argument():
 
 
 
+def train_normal():
+    pass
+
+
+def train_deepspeed():
+    pass
+
+
 
 def run():
+    """
+       pip install fire
 
+    """
     args = add_argument()
+
+    #import utilmy
+    #args = utilmy.to_namespace(ddict)
 
     if args.config != "":
         with open(args.config) as f:
