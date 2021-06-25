@@ -2,7 +2,7 @@ accelerate==0.3.0
 albumentations==1.0.0
 certifi==2021.5.30
 cycler==0.10.0
-dataclasses==0.8
+dataclasses
 decorator==4.4.2
 deepspeed==0.3.16
 efficientnet-pytorch==0.7.1
