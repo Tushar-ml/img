@@ -43,9 +43,18 @@ from torch.nn import functional as F
 from trainer import FashionModel
 
 
+
 def log(*s):
     print(*s, flush=True)
 
+def log2(*s):
+    print(*s, flush=True)
+
+def logw(*s):
+    print(*s, flush=True)
+
+def loge(*s):
+    print(*s, flush=True)
 
 
 def config_load(config_path: Optional[Union[str, pathlib.Path]] = None):
