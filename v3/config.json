@@ -1,0 +1,79 @@
+{
+    "base_dir": "./",
+    "input_dir": "data",
+    "models_dir": "models",
+    "output_dir": "output",
+    "vector_dir": "vectors",
+    "dataset_name": "fashion",
+    "train_dir": "train",
+    "test_dir": "test",
+    "csv_dir": "csv",
+    "root_df": "preprocessed_df.csv",
+    "train_df": "train.csv",
+    "val_df": "val.csv",
+    "inference_df": "pred.csv",
+    "batch_size": 16,
+    "device": "cuda",
+    "sample": true,
+    "preprocess": {
+        "base_df":  "styles.csv",
+        "preprocessed_df":  "preprocessed_df.csv",
+        "preprocessed_df_with_classes":  "preprocessed_df_with_classes.csv",
+        "train_df":  "train.csv",
+        "val_df":  "val.csv",
+        "image_exts": ["jpg", "png", "jpeg", "JPG", "PNG", "JPEG"],
+        "val_set_size": 0.2
+    },
+
+    "feature_extractor": {
+      "input_data_type": "train"
+    },
+
+    "logistic_regression": {
+
+      "target_col": "gender"
+
+    },
+
+    
+    "model_params": {
+        "efficientnet": {
+          "model_name": "efficientnet",
+          "in_features": 1536,
+          "intermediate_features": 128,
+          "dropout": 0.2,
+          "version": 1,
+          "model_path": null
+        },
+
+        "nfnets": {
+          "model_name": "nfnets",
+          "in_features": 3072,
+          "intermediate_features": 128,
+          "dropout": 0.2,
+          "version": 1,
+          "model_path": "model_pretrained_weights/F0_haiku.npz"
+        },
+
+        "bigmodel": {
+          "model_name": "bigmodel",
+          "in_features": 512,
+          "intermediate_features": 128,
+          "dropout": 0.2,
+          "version": 1,
+          "model_path": "model_pretrained_weights/bigmodel/model_weight.pt"
+        },
+
+        "smallmodel": {
+          "model_name": "smallmodel",
+          "in_features": 512,
+          "intermediate_features": 128,
+          "dropout": 0.2,
+          "version": 1,
+          "model_path": null,
+          "input_data_dir": "bigmodel"
+        }
+      
+  }
+
+}
