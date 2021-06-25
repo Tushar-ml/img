@@ -209,7 +209,7 @@ class FashionModel(tez.Model):
 
         # self.effnet = EfficientNet.from_pretrained("efficientnet-b3")
         # in_features = 1536
-        # intermediate_features = 512
+        # inter_feat = 512
         # Layer 1
         self.bn1            = nn.BatchNorm1d(num_features=in_features)
         self.dropout1       = nn.Dropout(0.25)

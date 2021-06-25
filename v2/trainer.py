@@ -63,7 +63,7 @@ class FashionModel(nn.Module):
         
         self.in_features = config['in_features']
 
-        self.intermediate_features = config['intermediate_features']
+        self.inter_feat = config['inter_feat']
 
         self.num_classes = num_classes
 
@@ -87,15 +87,15 @@ class FashionModel(nn.Module):
         self.linear1        = nn.Linear(in_features=self.in_features, out_features=256, bias=False)
         
         # Layer 2
-        self.linear2        = nn.Linear(in_features=256, out_features=self.intermediate_features, bias=False)
+        self.linear2        = nn.Linear(in_features=256, out_features=self.inter_feat, bias=False)
 
-        self.gender         = nn.Linear(self.intermediate_features, self.num_classes['gender'])
-        self.masterCategory = nn.Linear(self.intermediate_features, self.num_classes['masterCategory'])
-        self.subCategory    = nn.Linear(self.intermediate_features, self.num_classes['subCategory'])
-        self.articleType    = nn.Linear(self.intermediate_features, self.num_classes['articleType'])
-        self.baseColour     = nn.Linear(self.intermediate_features, self.num_classes['baseColour'])
-        self.season         = nn.Linear(self.intermediate_features, self.num_classes['season'])
-        self.usage          = nn.Linear(self.intermediate_features, self.num_classes['usage'])
+        self.gender         = nn.Linear(self.inter_feat, self.num_classes['gender'])
+        self.masterCategory = nn.Linear(self.inter_feat, self.num_classes['masterCategory'])
+        self.subCategory    = nn.Linear(self.inter_feat, self.num_classes['subCategory'])
+        self.articleType    = nn.Linear(self.inter_feat, self.num_classes['articleType'])
+        self.baseColour     = nn.Linear(self.inter_feat, self.num_classes['baseColour'])
+        self.season         = nn.Linear(self.inter_feat, self.num_classes['season'])
+        self.usage          = nn.Linear(self.inter_feat, self.num_classes['usage'])
        
         self.step_scheduler_after = "epoch"
 

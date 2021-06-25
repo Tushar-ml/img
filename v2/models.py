@@ -1,48 +1,15 @@
-import argparse
-import os
 import warnings
-from pathlib import Path
 
-import albumentations
-import cv2
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import tez
 import torch
 import torch.nn as nn
-import torchvision
-from PIL import Image
-from efficientnet_pytorch import EfficientNet, EfficientNet
-from sklearn import metrics, metrics, model_selection, model_selection, preprocessing
-from sklearn.model_selection import train_test_split
-from tez.callbacks import Callback, EarlyStopping, EarlyStopping
-from tez.datasets import ImageDataset, ImageDataset
-from torch.nn import functional as F
-from torch.utils.data import DataLoader, Dataset
-from torchvision.transforms import CenterCrop, Compose, Normalize, Resize, ToTensor
-from tqdm import tqdm
+from efficientnet_pytorch import EfficientNet
+from sklearn import metrics
 
 warnings.filterwarnings("ignore")
 
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-
-import pickle
-
-import json
-import sys
-from PIL import Image
-
-from nfnets import pretrained_nfnet, SGD_AGC
-
-import deepspeed
+from nfnets import pretrained_nfnet
 
 from torch.nn import functional as F
-
-
-
-from datasets import FashionImageDataset
 
 
 #######################################################################################################
@@ -52,17 +19,12 @@ class FashionModel(nn.Module):
     def __init__(self, config, num_classes):
         super().__init__()
 
-        self.config = config
-        
-        self.in_features = config['in_features']
-
-        self.intermediate_features = config['intermediate_features']
-
-        self.num_classes = num_classes
-
+        self.config       = config
+        self.in_features  = config['in_features']
+        self.inter_feat   = config['inter_feat']
+        self.num_classes  = num_classes
         self.dropout_prob = config['dropout']
-
-        self.model_name = config['model_name']
+        self.model_name   = config['model_name']
 
 
 
@@ -80,15 +42,15 @@ class FashionModel(nn.Module):
         self.linear1        = nn.Linear(in_features=self.in_features, out_features=256, bias=False)
         
         # Layer 2
-        self.linear2        = nn.Linear(in_features=256, out_features=self.intermediate_features, bias=False)
+        self.linear2        = nn.Linear(in_features=256, out_features=self.inter_feat, bias=False)
 
-        self.gender         = nn.Linear(self.intermediate_features, self.num_classes['gender'])
-        self.masterCategory = nn.Linear(self.intermediate_features, self.num_classes['masterCategory'])
-        self.subCategory    = nn.Linear(self.intermediate_features, self.num_classes['subCategory'])
-        self.articleType    = nn.Linear(self.intermediate_features, self.num_classes['articleType'])
-        self.baseColour     = nn.Linear(self.intermediate_features, self.num_classes['baseColour'])
-        self.season         = nn.Linear(self.intermediate_features, self.num_classes['season'])
-        self.usage          = nn.Linear(self.intermediate_features, self.num_classes['usage'])
+        self.gender         = nn.Linear(self.inter_feat, self.num_classes['gender'])
+        self.masterCategory = nn.Linear(self.inter_feat, self.num_classes['masterCategory'])
+        self.subCategory    = nn.Linear(self.inter_feat, self.num_classes['subCategory'])
+        self.articleType    = nn.Linear(self.inter_feat, self.num_classes['articleType'])
+        self.baseColour     = nn.Linear(self.inter_feat, self.num_classes['baseColour'])
+        self.season         = nn.Linear(self.inter_feat, self.num_classes['season'])
+        self.usage          = nn.Linear(self.inter_feat, self.num_classes['usage'])
        
         self.step_scheduler_after = "epoch"
 
@@ -132,23 +94,23 @@ class FashionModel(nn.Module):
             targets['baseColour']     = baseColourLabel
             targets['season']         = seasonLabel
             targets['usage']          = usageLabel
-        outputs                   = {}
-        outputs["gender"]         = self.gender(x)
-        outputs["masterCategory"] = self.masterCategory(x)
-        outputs["subCategory"]    = self.subCategory(x)
-        outputs["articleType"]    = self.articleType(x)
-        outputs["baseColour"]     = self.baseColour(x)
-        outputs["season"]         = self.season(x)
-        outputs["usage"]          = self.usage(x)
+        out                   = {}
+        out["gender"]         = self.gender(x)
+        out["masterCategory"] = self.masterCategory(x)
+        out["subCategory"]    = self.subCategory(x)
+        out["articleType"]    = self.articleType(x)
+        out["baseColour"]     = self.baseColour(x)
+        out["season"]         = self.season(x)
+        out["usage"]          = self.usage(x)
 
         if targets is not None:
             loss = []
-            for k,v in outputs.items():
-                loss.append(nn.CrossEntropyLoss()(outputs[k], targets[k]))
+            for k,v in out.items():
+                loss.append(nn.CrossEntropyLoss()(out[k], targets[k]))
             loss = sum(loss)
-            metrics = self.monitor_metrics(outputs, targets)
-            return outputs, loss, metrics
-        return outputs, None, None
+            metrics = self.monitor_metrics(out, targets)
+            return out, loss, metrics
+        return out, None, None
     
     def extract_features(self, image):
         batch_size = image.shape[0]

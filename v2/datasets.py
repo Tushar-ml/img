@@ -1,45 +1,15 @@
-import argparse
 import os
 import warnings
-from pathlib import Path
 
-import albumentations
-import cv2
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import tez
 import torch
-import torch.nn as nn
-import torchvision
-from PIL import Image
-from efficientnet_pytorch import EfficientNet, EfficientNet
-from sklearn import metrics, metrics, model_selection, model_selection, preprocessing
-from sklearn.model_selection import train_test_split
-from tez.callbacks import Callback, EarlyStopping, EarlyStopping
-from tez.datasets import ImageDataset, ImageDataset
-from torch.nn import functional as F
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import Dataset
 from torchvision.transforms import CenterCrop, Compose, Normalize, Resize, ToTensor
-from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-
-import pickle
-
-import json
-import sys
 from PIL import Image
-
-from nfnets import pretrained_nfnet, SGD_AGC
-
-import deepspeed
-
-from torch.nn import functional as F
-
 
 
 # =====================================================================

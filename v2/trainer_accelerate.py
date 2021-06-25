@@ -84,7 +84,7 @@ class FashionModel(nn.Module):
         
         self.in_features = config['in_features']
 
-        self.intermediate_features = config['intermediate_features']
+        self.intermediate_features = config['inter_feat']
 
         self.num_classes = num_classes
 
