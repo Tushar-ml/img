@@ -17,7 +17,7 @@ from PIL import Image
 # =====================================================================
 class FashionImageDataset(Dataset):
 
-    def __init__(self, IMAGE_PATH, DF_PATH, config, labels_required = True, use_features=True, aug=None, inference=False):
+    def __init__(self, IMAGE_PATH, DF_PATH, config, labels_required = True, use_features=False, aug=None, inference=False):
         """
         Args:
             IMAGE_PATH (string): Directory with all the images or vectors
@@ -29,7 +29,7 @@ class FashionImageDataset(Dataset):
         """
         self.image_dir       = IMAGE_PATH
         if config['sample']:
-            self.df              = pd.read_csv(DF_PATH, nrows=200)
+            self.df              = pd.read_csv(DF_PATH, nrows=config['sample'])
         else:
             self.df              = pd.read_csv(DF_PATH)
        
@@ -107,4 +107,9 @@ class FashionImageDataset(Dataset):
 
 if __name__ == "__main__":
    import fire
-   fire.Fire()
+   image_path = 'data/fashion/train'
+   csv_path = 'data/fashion/csv/train.csv'
+   config = {
+       'sample':7000
+   }
+   fire.Fire(FashionImageDataset(image_path,csv_path,config)[5244])

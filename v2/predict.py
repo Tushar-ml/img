@@ -24,7 +24,7 @@ from torchvision.transforms import CenterCrop, Compose, Normalize, Resize, ToTen
 from tqdm import tqdm
 
 
-from Path import  pathlib
+from pathlib import Path
 warnings.filterwarnings("ignore")
 
 from sklearn.linear_model import LogisticRegression
@@ -185,7 +185,7 @@ def generate_dataset(config):
 ######################################################################
 if __name__ == "__main__":
     import fire
-    fire.Fire()
+    fire.Fire(generate_dataset)
 
 
 
